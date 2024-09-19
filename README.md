@@ -1,0 +1,176 @@
+# Custom Command Buttons
+
+Add custom buttons to the Visual Studio Code status bar to execute terminal
+commands with a single click.
+
+## Description
+
+The **Custom Command Buttons** extension allows you to enhance your productivity
+by adding custom buttons to the VS Code status bar. Each button can be
+configured to run a specific terminal command, making it easier to execute
+frequently used commands without leaving the editor.
+
+## Features
+
+- **User-Friendly GUI**: Easily add, edit, or remove buttons using a graphical
+  interface.
+- **Customizable Buttons**: Configure button text, tooltip, color, alignment,
+  priority, and terminal name.
+- **Execute Terminal Commands**: Run any terminal command directly from the
+  status bar.
+- **Dynamic Updates**: Changes to buttons are applied immediately without
+  restarting VS Code.
+- **No Icons Displayed**: Buttons display text only, keeping the status bar
+  clean and minimalistic.
+
+## Installation
+
+### Prerequisites
+
+- **Visual Studio Code** version **1.50.0** or higher.
+
+### Steps
+
+1. **Download the Extension**
+
+   - Obtain the `.vsix` file of the extension from the release page or package
+     it yourself.
+
+2. **Install the Extension**
+
+   - Open VS Code.
+   - Go to the **Extensions** view by clicking on the Extensions icon in the
+     Activity Bar or pressing `Ctrl+Shift+X` (`Cmd+Shift+X` on macOS).
+   - Click on the `...` (More Actions) button in the upper-right corner of the
+     Extensions view.
+   - Select **"Install from VSIX..."** from the dropdown menu.
+   - Navigate to the downloaded `.vsix` file, select it, and click **Open**.
+   - Reload VS Code when prompted to activate the extension.
+
+## Usage
+
+### Adding Custom Buttons
+
+1. **Open the Command Palette**
+
+   - Press `Ctrl+Shift+P` (Windows/Linux) or `Cmd+Shift+P` (macOS).
+
+2. **Run the "Manage Custom Buttons" Command**
+
+   - Type `Manage Custom Buttons` and select it from the list.
+
+3. **Use the GUI to Add Buttons**
+
+   - Click on **Add Button** to create a new custom button.
+   - **Fill in the Required Fields:**
+     - **Text**: The label displayed on the button (e.g., `Build Project`).
+     - **Command**: The terminal command to execute when the button is clicked
+       (e.g., `npm run build`).
+   - **Optional Fields:**
+     - **Tooltip**: A brief description shown when hovering over the button.
+     - **Color**: Choose a color for the button text using the color picker.
+     - **Alignment**: Position the button on the `left` or `right` side of the
+       status bar.
+     - **Priority**: A number determining the order of buttons; higher numbers
+       are placed more prominently.
+     - **Terminal Name**: Specify a name for the terminal that runs the command.
+
+4. **Save Changes**
+
+   - Click on **Save Changes** to apply the updates.
+   - The new buttons will appear on the status bar immediately.
+
+### Using the Buttons
+
+- Click on any custom button in the status bar to execute its associated
+  terminal command.
+- The command will run in a new terminal within VS Code.
+
+### Editing or Deleting Buttons
+
+1. **Open the "Manage Custom Buttons" GUI**
+
+   - Use the Command Palette to run `Manage Custom Buttons`.
+
+2. **Modify Existing Buttons**
+
+   - Update the fields for any button as needed.
+   - Click **Save Changes** to apply updates.
+
+3. **Delete Buttons**
+
+   - Click on the **Delete** button next to a custom button to remove it.
+   - Save changes to update the status bar.
+
+## Troubleshooting
+
+### Buttons Not Appearing
+
+- Ensure that both the **Text** and **Command** fields are filled out for each
+  button.
+- Click **Save Changes** after adding or editing buttons.
+- Reload VS Code if the buttons do not appear after saving.
+
+### Commands Not Executing
+
+- Verify that the command works when run directly in a terminal.
+- Check for typos or errors in the command field.
+- Ensure that any required environment variables or PATH configurations are
+  properly set.
+
+## Development
+
+### Building the Extension
+
+1. **Clone the Repository**
+
+   ```bash
+   git clone https://github.com/yourusername/custom-command-buttons.git
+   cd custom-command-buttons
+   ```
+
+2. **Install Dependencies**
+
+   ```bash
+   npm install
+   ```
+
+3. **Compile the Extension**
+
+   ```bash
+   npm run compile
+   ```
+
+   - If using a bundler like webpack:
+
+     ```bash
+     npm run build
+     ```
+
+4. **Launch the Extension**
+
+   - Open the project in VS Code.
+   - Press `F5` to start the Extension Development Host and test your extension.
+
+### Packaging the Extension
+
+- Use `vsce` to package the extension into a `.vsix` file:
+
+  ```bash
+  vsce package
+  ```
+
+## Contributing
+
+Contributions are welcome! If you have ideas for improvements or encounter any
+issues, please open an issue or submit a pull request on the
+[GitHub repository](https://github.com/yourusername/custom-command-buttons).
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+## Acknowledgments
+
+- Thanks to all contributors and users who have provided feedback and
+  suggestions.

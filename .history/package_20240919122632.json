@@ -3,7 +3,7 @@
   "displayName": "Custom Command Buttons",
   "description": "Add custom icon buttons to execute terminal commands",
   "version": "0.0.1",
-  "publisher": "JijoNJ",
+  "publisher": "Jijo N J",
   "engines": {
     "vscode": "^1.93.0"
   },

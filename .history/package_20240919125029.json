@@ -2,7 +2,7 @@
   "name": "custom-command-buttons",
   "displayName": "Custom Command Buttons",
   "description": "Add custom icon buttons to execute terminal commands",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "publisher": "JijoNJ",
   "icon": "assets/logo.png",
   "galleryBanner": {

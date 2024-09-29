@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 
 let statusBarItems: vscode.StatusBarItem[] = [];
 let registeredCommands: vscode.Disposable[] = [];
-let lastUsedTerminal: vscode.Terminal | undefined;
 
 export function activate(context: vscode.ExtensionContext) {
   function createButtons() {
@@ -29,22 +28,22 @@ export function activate(context: vscode.ExtensionContext) {
           if (selected) {
             const cmd = buttonConfig.commands.find((c: any) => c.label === selected);
             if (cmd) {
+              const terminalName = cmd.terminalName || `Terminal ${index + 1}`;
               let terminal: vscode.Terminal | undefined;
 
-              // Check if we should use the last used terminal
-              if (cmd.useLastTerminal && lastUsedTerminal) {
-                terminal = lastUsedTerminal;
-                terminal.show();
-              } else {
-                const terminalName = cmd.terminalName || `Terminal ${index + 1}`;
-                terminal = vscode.window.createTerminal(terminalName);
-                terminal.show();
-
-                // If 'Use Last Terminal' is checked, store this terminal
-                if (cmd.useLastTerminal) {
-                  lastUsedTerminal = terminal;
+              if (cmd.createNewTerminal === false) {
+                // Try to find an existing terminal with the given name
+                terminal = vscode.window.terminals.find((t) => t.name === terminalName);
+                if (!terminal) {
+                  // If not found, create a new terminal
+                  terminal = vscode.window.createTerminal(terminalName);
                 }
+              } else {
+                // Create new terminal
+                terminal = vscode.window.createTerminal(terminalName);
               }
+
+              terminal.show();
 
               // Replace variables in command if needed
               let commandToExecute = cmd.command;
@@ -85,25 +84,27 @@ export function activate(context: vscode.ExtensionContext) {
   createButtons();
 
   // Register the command to open the GUI
-  const manageButtonsCommand = vscode.commands.registerCommand('customCommandButtons.manageButtons', () => {
-    openManageButtonsWebview(context, createButtons);
-  });
-  context.subscriptions.push(manageButtonsCommand);
-
-  // Listen for terminal close events to reset lastUsedTerminal if it's closed
-  context.subscriptions.push(
-    vscode.window.onDidCloseTerminal((closedTerminal) => {
-      if (closedTerminal === lastUsedTerminal) {
-        lastUsedTerminal = undefined;
-      }
-    })
+  const manageButtonsCommand = vscode.commands.registerCommand(
+    'customCommandButtons.manageButtons',
+    () => {
+      openManageButtonsWebview(context, createButtons);
+    }
   );
+  context.subscriptions.push(manageButtonsCommand);
 }
 
-function openManageButtonsWebview(context: vscode.ExtensionContext, refreshButtons: () => void) {
-  const panel = vscode.window.createWebviewPanel('manageButtons', 'Manage Custom Buttons', vscode.ViewColumn.One, {
-    enableScripts: true,
-  });
+function openManageButtonsWebview(
+  context: vscode.ExtensionContext,
+  refreshButtons: () => void
+) {
+  const panel = vscode.window.createWebviewPanel(
+    'manageButtons',
+    'Manage Custom Buttons',
+    vscode.ViewColumn.One,
+    {
+      enableScripts: true,
+    }
+  );
 
   // Get existing buttons
   const buttons = context.globalState.get<any[]>('customCommandButtons') || [];
@@ -197,7 +198,7 @@ function getWebviewContent(buttonsJson: string) {
                 <label>Label: <input type="text" data-button-index="\${buttonIndex}" data-command-index="\${cmdIndex}" data-field="label" value="\${cmd.label}" /></label>
                 <label>Command: <input type="text" data-button-index="\${buttonIndex}" data-command-index="\${cmdIndex}" data-field="command" value="\${cmd.command}" /></label>
                 <label>Terminal Name: <input type="text" data-button-index="\${buttonIndex}" data-command-index="\${cmdIndex}" data-field="terminalName" value="\${cmd.terminalName || ''}" /></label>
-                <label><input type="checkbox" data-button-index="\${buttonIndex}" data-command-index="\${cmdIndex}" data-field="useLastTerminal" \${cmd.useLastTerminal ? 'checked' : ''}/> Use Last Terminal</label>
+                <label><input type="checkbox" data-button-index="\${buttonIndex}" data-command-index="\${cmdIndex}" data-field="createNewTerminal"\${cmd.createNewTerminal ? ' checked' : ''}/> Create New Terminal</label>
                 <button data-button-index="\${buttonIndex}" data-command-index="\${cmdIndex}" class="delete-command-button">Delete Command</button>
               </div>
             \`;
@@ -231,18 +232,17 @@ function getWebviewContent(buttonsJson: string) {
           const commandIndex = target.getAttribute('data-command-index');
           const field = target.getAttribute('data-field');
 
+          let value;
+          if (target.type === 'checkbox') {
+            value = target.checked;
+          } else {
+            value = target.value;
+          }
+
           if (field && index !== null) {
-            if (target.type === 'checkbox') {
-              buttons[index][field] = target.checked;
-            } else {
-              buttons[index][field] = target.value;
-            }
+            buttons[index][field] = value;
           } else if (field && buttonIndex !== null && commandIndex !== null) {
-            if (target.type === 'checkbox') {
-              buttons[buttonIndex].commands[commandIndex][field] = target.checked;
-            } else {
-              buttons[buttonIndex].commands[commandIndex][field] = target.value;
-            }
+            buttons[buttonIndex].commands[commandIndex][field] = value;
           }
         });
 
@@ -251,8 +251,7 @@ function getWebviewContent(buttonsJson: string) {
             const index = event.target.getAttribute('data-index');
             buttons[index].commands.push({
               label: '',
-              command: '',
-              useLastTerminal: false
+              command: ''
             });
             renderButtons();
           } else if (event.target.classList.contains('delete-command-button')) {
